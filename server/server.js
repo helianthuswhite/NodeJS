@@ -10,6 +10,6 @@
 
  	//发送响应数据
  	response.end('Hello World\n');
- }).listen(5678);
+ }).listen(2333);
 
- console.log('http://127.0.0.1:5678/');
+ console.log('http://127.0.0.1:2333/');
