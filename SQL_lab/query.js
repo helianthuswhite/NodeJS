@@ -32,10 +32,10 @@ app.get('/query',function (req,res) {
 		address:req.query.address
 	};
 
-	console.log(response);
+	console.log('response的值为：'+response);
 	var results = query(response);
 	// res.end(JSON.stringify(results));
-	console.log(results);
+	console.log('query函数返回的results为：'+results);
 	return response;
 });
 

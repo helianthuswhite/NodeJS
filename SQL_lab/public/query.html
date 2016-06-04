@@ -23,7 +23,7 @@
 				</div>
 				<div class="query_head">
 					<label>地址：</label>
-					<input type="text" name="customerName">
+					<input type="text" name="address">
 				</div>
 				<div class="query_head">
 					<input type="button" value="查询" id="query">
@@ -44,17 +44,16 @@
 	</section>
 <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
 <script type="text/javascript">
-	$(document).ready(
-		$('#query').click = function () {
-				alert(11);
-				var data = $('#query_form').serialize();
-				console.log(data);
-				$.get('/query'+data,function (results) {
-					console.log(results);
+	$(document).ready(function () {
+		$('#query').click(function () {
+				var dataArray = $('#query_form').serializeArray();
+				// console.log(data);
+				$.get('/query?customerNo=7',function (results) {
+						console.log('返回的结果是：'+results);
 				});
 			return false;
-		}
-	);
+		});
+	});
 </script>
 </body>
 </html>
