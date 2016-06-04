@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>数据库编程实验</title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<nav></nav>
+	<section id="customer">
+		<nav>
+			<form id="query_form">
+				<div class="query_head">
+					<label>编号：</label>
+					<input type="text" name="customerNo">
+				</div>
+				<div class="query_head">
+					<label>名称：</label>
+					<input type="text" name="customerName">
+				</div>
+				<div class="query_head">
+					<label>电话：</label>
+					<input type="text" name="telephone">
+				</div>
+				<div class="query_head">
+					<label>地址：</label>
+					<input type="text" name="customerName">
+				</div>
+				<div class="query_head">
+					<input type="button" value="查询" id="query">
+				</div>
+			</form>
+		</nav>
+		<div>
+			<table border="1">
+				<tr>
+					<th>编号</th>
+					<th>名称</th>
+					<th>电话</th>
+					<th>地址</th>
+					<th>邮编</th>
+				</tr>
+			</table>
+		</div>
+	</section>
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+	$(document).ready(
+		$('#query').click = function () {
+				alert(11);
+				var data = $('#query_form').serialize();
+				console.log(data);
+				$.get('/query'+data,function (results) {
+					console.log(results);
+				});
+			return false;
+		}
+	);
+</script>
+</body>
+</html>
