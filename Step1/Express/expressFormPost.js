@@ -3,7 +3,7 @@ var app = express();
 var bodyParser = require('body-parser');
 
 // 创建 application/x-www-form-urlencoded 编码解析
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 app.use(express.static('public'));
 

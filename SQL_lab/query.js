@@ -1,6 +1,16 @@
 //引入express框架
 var express = require('express');
 var app = express();
+
+//加载异步回调函数处理
+var async = require('async');
+
+//解析json
+var bodyParser = require('body-parser');
+
+// 创建 application/x-www-form-urlencoded 编码解析
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
 var path = require('path');
 //加载静态文件
 app.use(express.static(path.join(__dirname,'/public')));
@@ -22,21 +32,19 @@ app.get('/query.html',function (req,res) {
 	res.sendFile(__dirname + '/public/query.html');
 });
 
-app.get('/query',function (req,res) {
+app.post('/query',urlencodedParser,function (req,res) {
 
 	//输出JSON格式
 	response = {
-		customerNo:req.query.customerNo,
-		customerName:req.query.customerName,
-		telephone:req.query.telephone,
-		address:req.query.address
+		customerNo:req.body.customerNo,
+		customerName:req.body.customerName,
+		telephone:req.body.telephone,
+		address:req.body.address
 	};
 
-	console.log('response的值为：'+response);
-	var results = query(response);
-	// res.end(JSON.stringify(results));
-	console.log('query函数返回的results为：'+results);
-	return response;
+	// console.log('response的值为：'+JSON.stringify(response));
+	query(response,res);
+	// res.send(JSON.stringify(results));
 });
 
 var server = app.listen(2333,function () {
@@ -47,8 +55,7 @@ var server = app.listen(2333,function () {
 });
 
 
-function query (args) {
-	// console.log(args);
+function query (args,res) {
 	client.query("use " + DATABASE);
   	client.query(  
   	"SELECT * FROM "+TABLE+" WHERE customerNo LIKE '%"+args.customerNo+"%'",  
@@ -58,9 +65,9 @@ function query (args) {
     	}  
       	if(results)
       	{
-          	return results;
+          	res.send(results);
       	}    
-    client.end();  
+    	// client.end();  
   }); 
 }
 

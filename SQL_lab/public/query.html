@@ -30,7 +30,7 @@
 				</div>
 			</form>
 		</nav>
-		<div>
+		<div id="customer_body">
 			<table border="1">
 				<tr>
 					<th>编号</th>
@@ -47,12 +47,22 @@
 	$(document).ready(function () {
 		$('#query').click(function () {
 				var dataArray = $('#query_form').serializeArray();
-				// console.log(data);
-				$.get('/query?customerNo=7',function (results) {
-						console.log('返回的结果是：'+results);
+				// console.log(JSON.stringify(dataArray));
+				$.post('/query',dataArray,function (results) {
+						$.each(results,function () {
+							createNew($(this)[0].customerNo,$(this)[0].customerName,
+								$(this)[0].telephone,$(this)[0].address,$(this)[0].zip);
+						});
 				});
 			return false;
 		});
+
+		//创建新的数据
+		function createNew(customerNo,customerName,telephone,address,zip) {
+			var table = $('#customer_body > table');
+			var tr = '<tr><td>'+customerNo+'</td><td>'+customerName+'</td><td>'+telephone+'</td><td>'+address+'</td><td>'+zip+'</td></tr>';
+			table.append(tr);
+		}
 	});
 </script>
 </body>
