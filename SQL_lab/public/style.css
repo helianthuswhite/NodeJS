@@ -7,10 +7,149 @@ body {
 	background: #E6E6E6;
 }
 #head {
+	position: relative;
 	width: 100%;
 	height: 150px;
-	background: blue;
+	background: #2B2821;
+}
+#head h1 {
+	position: relative;
+	top: 20px;
+	text-align: center;
+	color: #6CBD50;
+}
+#head .user {
+	position: relative;
+	margin-left: 50px;
+	margin-top: 90px;
+}
+#head span {
+	display: inline-block;
+	color: #fff;
+}
+#head a {
+	display: inline-block;
+	color: #6CBD50;
 }
 #head_nav {
-	
+	position: relative;
+	height: 50px; 
+	background: #006400;
 }
+#head_nav img {
+	height: 100px;
+	width: 200px;
+	margin-top: -25px;
+	margin-left: 20px;
+}
+#head_nav > ul {
+	position: relative;
+	float: right;
+	margin-right: 50px;
+	list-style: none;
+}
+#head_nav > ul > li {
+	position: relative;
+	float: left;
+}
+#head_nav > ul >li a{
+	display: block;
+	width: 150px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	color: #fff;
+	text-decoration: none;
+}
+#head_nav > ul >li a:hover {
+	background: #E6E6E6;
+	color: #006400;
+}
+#head_nav .menu:hover >ul{
+	display: block;
+}
+#head_nav .menu > ul {
+	position: absolute;
+	display: none;
+	box-sizing: border-box;
+	list-style: none;
+	border: solid 1px #006400;
+	z-index: 999;
+}
+#head_nav .menu > ul li a{
+	display: block;
+	color: #006400;
+	background: #E6E6E6;
+	border-bottom: dotted 1px #006400;
+}
+#head_nav .menu > ul li a:hover {
+	text-decoration:underline;
+	color: #FD8B50;
+}
+#body img {
+	display: block;
+	margin: 150px auto;
+	box-shadow: 0 15px 10px -15px #000;
+}
+
+/************客户查询样式************/
+#body #customer {
+	width: 1200px;
+	margin: 15px auto;
+}
+#body #customer #query_form{
+	position: relative;
+}
+#body #query_form .query_head {
+	position: relative;
+	display: inline-block;
+	height: 50px;
+	line-height: 50px;
+	margin: 0 20px;	
+}
+#body .query_head label {
+	font-size: 18px;
+} 
+#body .query_head input[type='text'] {
+	height: 20px;
+	width: 150px;
+}
+#body .query_head input[type='button'] {
+	width: 100px;
+	height: 30px;
+	background: #6CBD50;
+	border: none;
+	font-size: 18px;
+	color: #fff;
+}
+#body .query_head input[type='button']:hover {
+	background: #006400;
+	color: #FD8B50;
+}
+#body #customer_body {
+	position: relative;
+	margin-top: 20px;
+}
+#body #customer_body table {
+	width: 100%;
+}
+#body #customer_body table tr {
+	height: 30px;
+}
+#body #customer_body table tr:first-child {
+	background: #006400;
+	color: #fff;
+}
+#body #customer_body table tr td {
+	text-align: center;
+	border-bottom: solid 1px #006400;
+}
+footer {
+	position: absolute;
+	bottom: 10px;
+	left: 50%;
+	margin-left: -120px;
+}
+
+
+

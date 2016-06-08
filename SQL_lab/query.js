@@ -97,3 +97,4 @@ function query (args,res) {
   }); 
 }
 
+module.exports = query;
