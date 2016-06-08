@@ -47,8 +47,16 @@
 	$(document).ready(function () {
 		$('#query').click(function () {
 				var dataArray = $('#query_form').serializeArray();
-				// console.log(JSON.stringify(dataArray));
+				// console.log(dataArray[0].value);
+				for(var i in dataArray) {
+					dataArray[i].value = dataArray[i].value.trim();
+				}
 				$.post('/query',dataArray,function (results) {
+						if(results.length == 0) {
+							alert('未能查到正确数据!');
+							return;
+						}
+						clearTable();
 						$.each(results,function () {
 							createNew($(this)[0].customerNo,$(this)[0].customerName,
 								$(this)[0].telephone,$(this)[0].address,$(this)[0].zip);
@@ -62,6 +70,14 @@
 			var table = $('#customer_body > table');
 			var tr = '<tr><td>'+customerNo+'</td><td>'+customerName+'</td><td>'+telephone+'</td><td>'+address+'</td><td>'+zip+'</td></tr>';
 			table.append(tr);
+		}
+
+		//销毁表格中的已有数据
+		function clearTable() {
+			var table = $('#customer_body > table');
+			table.find('tr').remove();
+			// alert(table.find('tr').html());
+			table.append('<tr><th>编号</th><th>名称</th><th>电话</th><th>地址</th><th>邮编</th></tr>');
 		}
 	});
 </script>

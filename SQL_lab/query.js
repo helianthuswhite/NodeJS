@@ -56,10 +56,36 @@ var server = app.listen(2333,function () {
 
 
 function query (args,res) {
+	console.log(args);
+	var SQL = 'SELECT * FROM ' + TABLE;
+	var WHERE = '';
+	if(args.customerNo!=''&&args.customerNo!=null) {
+		if(WHERE == ''||WHERE == null)
+			WHERE = WHERE + ' WHERE customerNo LIKE "%' + args.customerNo +'%"';
+		else
+			WHERE = WHERE + ' AND customerNo LIKE "%' + args.customerNo + '%"';
+	}
+	if(args.customerName!=''&&args.customerName!=null) {
+		if(WHERE == ''||WHERE == null)
+			WHERE = WHERE + ' WHERE customerName LIKE "%' + args.customerName +'%"';
+		else
+			WHERE = WHERE + ' AND customerName LIKE "%' + args.customerName + '%"';
+	}
+	if(args.telephone!=''&&args.telephone!=null) {
+		if(WHERE == ''||WHERE == null)
+			WHERE = WHERE + ' WHERE telephone LIKE "%' + args.telephone +'%"';
+		else
+			WHERE = WHERE + ' AND telephone LIKE "%' + args.telephone + '%"';	
+	}
+	if(args.address!=''&&args.address!=null) {
+		if(WHERE == ''||WHERE == null)
+			WHERE = WHERE + ' WHERE address LIKE "%' + args.address +'%"';
+		else
+			WHERE = WHERE + ' AND address LIKE "%' + args.address + '%"';
+	}
+	console.log(SQL+WHERE);
 	client.query("use " + DATABASE);
-  	client.query(  
-  	"SELECT * FROM "+TABLE+" WHERE customerNo LIKE '%"+args.customerNo+"%'",  
-  	function selectCb(err, results, fields) {  
+  	client.query(SQL+WHERE,function selectCb(err, results, fields) {  
     	if (err) {  
       		throw err;  
     	}  
