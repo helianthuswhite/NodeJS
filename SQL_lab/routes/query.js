@@ -1,19 +1,11 @@
-//引入express框架
+//引入express包
 var express = require('express');
 var app = express();
 
-//加载异步回调函数处理
-var async = require('async');
-
-//解析json
-var bodyParser = require('body-parser');
-
-// 创建 application/x-www-form-urlencoded 编码解析
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
-
-var path = require('path');
 //加载静态文件
+var path = require('path');
 app.use(express.static(path.join(__dirname,'/public')));
+
 //引入mysql连接包
 var mysql = require('mysql');
 
@@ -27,36 +19,20 @@ var client = mysql.createConnection({
 });  
 client.connect();
 
-
-app.get('/query.html',function (req,res) {
-	res.sendFile(__dirname + '/public/query.html');
-});
-
-app.post('/query',urlencodedParser,function (req,res) {
-
-	//输出JSON格式
-	response = {
-		customerNo:req.body.customerNo,
-		customerName:req.body.customerName,
-		telephone:req.body.telephone,
-		address:req.body.address
-	};
-
-	// console.log('response的值为：'+JSON.stringify(response));
-	query(response,res);
-	// res.send(JSON.stringify(results));
-});
-
-var server = app.listen(2333,function () {
-	var host = server.address().address;
-	var port = server.address().port;
-
-	console.log('应用实例，访问地址为http://%s:%s',host,port);
-});
-
+var Query = {
+	post:function(req,res) {
+		//输出JSON格式
+		response = {
+			customerNo:req.body.customerNo,
+			customerName:req.body.customerName,
+			telephone:req.body.telephone,
+			address:req.body.address
+		};
+		query(response,res);
+	}
+}
 
 function query (args,res) {
-	console.log(args);
 	var SQL = 'SELECT * FROM ' + TABLE;
 	var WHERE = '';
 	if(args.customerNo!=''&&args.customerNo!=null) {
@@ -83,7 +59,7 @@ function query (args,res) {
 		else
 			WHERE = WHERE + ' AND address LIKE "%' + args.address + '%"';
 	}
-	console.log(SQL+WHERE);
+	// console.log(SQL+WHERE);
 	client.query("use " + DATABASE);
   	client.query(SQL+WHERE,function selectCb(err, results, fields) {  
     	if (err) {  
@@ -92,9 +68,8 @@ function query (args,res) {
       	if(results)
       	{
           	res.send(results);
-      	}    
-    	// client.end();  
-  }); 
+      	}     
+  	}); 
 }
 
-module.exports = query;
+module.exports = Query;
