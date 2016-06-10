@@ -65,7 +65,7 @@
 						<input type="text" name="zip">
 					</div>
 					<div class="query_head">
-						<input type="button" value="查询" id="query">
+						<input type="button" value="提交" id="alter">
 					</div>
 				</form>
 			</nav>
@@ -86,15 +86,26 @@
 	<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function () {
-			$('#query').click(function () {
+			$.post('/query',function (results) {
+					if(results.length == 0) {
+						alert('未能查到正确数据!');
+						return;
+					}
+					clearTable();
+					$.each(results,function () {
+					createNew($(this)[0].customerNo,$(this)[0].customerName,
+						$(this)[0].telephone,$(this)[0].address,$(this)[0].zip);
+				});
+			});
+
+			$('#alter').click(function () {
 					var dataArray = $('#query_form').serializeArray();
 					// console.log(dataArray[0].value);
 					for(var i in dataArray) {
 						dataArray[i].value = dataArray[i].value.trim();
 					}
-					$.post('/query',dataArray,function (results) {
+					$.post('/alter',dataArray,function (results) {
 							if(results.length == 0) {
-								alert('未能查到正确数据!');
 								return;
 							}
 							clearTable();
@@ -106,22 +117,37 @@
 				return false;
 			});
 
-			//获取table
-			var table = $('#customer_body > table');
-
-			//创建新的数据
-			function createNew(customerNo,customerName,telephone,address,zip) {
-				var tr = '<tr><td>'+customerNo+'</td><td>'+customerName+'</td><td>'+telephone+'</td><td>'+address+'</td><td>'+zip+'</td></tr>';
-				table.append(tr);
-			}
-
-			//销毁表格中的已有数据
-			function clearTable() {
-				table.find('tr').remove();
-				// alert(table.find('tr').html());
-				table.append('<tr><th>编号</th><th>名称</th><th>电话</th><th>地址</th><th>邮编</th></tr>');
-			}
 		});
+
+		//获取table
+		var table = $('#customer_body > table');
+
+		//创建新的数据
+		function createNew(customerNo,customerName,telephone,address,zip) {
+			var tr = '<tr onclick="getRow(this);"><td>'+customerNo+'</td><td>'+customerName+'</td><td>'+telephone+'</td><td>'+address+'</td><td>'+zip+'</td></tr>';
+			table.append(tr);
+		}
+
+		//销毁表格中的已有数据
+		function clearTable() {
+			table.find('tr').remove();
+			// alert(table.find('tr').html());
+			table.append('<tr><th>编号</th><th>名称</th><th>电话</th><th>地址</th><th>邮编</th></tr>');
+		}
+			
+		//点击选中某一行
+		function getRow(obj) {
+			trArray = table.find('tr');
+			for (var i = trArray.length - 1;i>0;i--) {
+				trArray[i].style = 'background:#E6E6E6';
+			}
+			$(obj).css({'background':'#6CBD50'});
+			var tdArray = $(obj).find('td');
+			var inputArray = $('input[type="text"]');
+			for (var i = 0; i < tdArray.length; i++) {
+				inputArray[i].value = tdArray[i].innerHTML;
+			}		
+		}
 	</script>
 </body>
 </html>

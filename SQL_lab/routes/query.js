@@ -26,7 +26,8 @@ var Query = {
 			customerNo:req.body.customerNo,
 			customerName:req.body.customerName,
 			telephone:req.body.telephone,
-			address:req.body.address
+			address:req.body.address,
+			zip:req.body.zip
 		};
 		query(response,res);
 	}
@@ -58,6 +59,12 @@ function query (args,res) {
 			WHERE = WHERE + ' WHERE address LIKE "%' + args.address +'%"';
 		else
 			WHERE = WHERE + ' AND address LIKE "%' + args.address + '%"';
+	}
+	if(args.zip!=''&&args.zip!=null) {
+		if(WHERE == ''||WHERE == null)
+			WHERE = WHERE + ' WHERE zip LIKE "%' + args.zip +'%"';
+		else
+			WHERE = WHERE + ' AND zip LIKE "%' + args.zip + '%"';
 	}
 	// console.log(SQL+WHERE);
 	client.query("use " + DATABASE);
