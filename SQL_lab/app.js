@@ -15,6 +15,9 @@ app.use(express.static(path.join(__dirname,'/public')));
 //引入查询模块query.js
 var query = require('./routes/query');
 
+//引入修改模块update.js
+var update = require('./routes/update');
+
 app.get('/index.html',function (req,res) {
 	res.sendFile(__dirname + '/public/index.html');
 });
@@ -22,6 +25,11 @@ app.get('/index.html',function (req,res) {
 //处理query请求
 app.post('/query',urlencodedParser,function (req,res){
 	query.post(req,res);
+});
+
+//处理update请求
+app.post('/update',urlencodedParser,function(req,res){
+	update.post(req,res);
 });
 
 //服务器启动

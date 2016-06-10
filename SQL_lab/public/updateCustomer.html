@@ -27,9 +27,9 @@
 			<li class="menu">
 				<a href="javascript:void(0);">修改信息</a>
 				<ul>
-					<li><a href="alterCustomer.html">修改客户信息</a></li>
-					<li><a href="alterProduct.html">修改产品信息</a></li>
-					<li><a href="alterEmployee.html">修改员工信息</a></li>
+					<li><a href="updateCustomer.html">修改客户信息</a></li>
+					<li><a href="updateProduct.html">修改产品信息</a></li>
+					<li><a href="updateEmployee.html">修改员工信息</a></li>
 				</ul>
 			</li>
 			<li>
@@ -46,7 +46,7 @@
 				<form id="query_form">
 					<div class="query_head">
 						<label>编号：</label>
-						<input type="text" name="customerNo">
+						<input type="text" name="customerNo" readonly="true">
 					</div>
 					<div class="query_head">
 						<label>名称：</label>
@@ -65,7 +65,7 @@
 						<input type="text" name="zip">
 					</div>
 					<div class="query_head">
-						<input type="button" value="提交" id="alter">
+						<input type="button" value="提交" id="update">
 					</div>
 				</form>
 			</nav>
@@ -98,21 +98,31 @@
 				});
 			});
 
-			$('#alter').click(function () {
+			$('#update').click(function () {
 					var dataArray = $('#query_form').serializeArray();
 					// console.log(dataArray[0].value);
 					for(var i in dataArray) {
 						dataArray[i].value = dataArray[i].value.trim();
+						if(dataArray[i].value == ''||dataArray[i].value == null) {
+							alert('数据不能为空！');
+							return;
+						}
 					}
-					$.post('/alter',dataArray,function (results) {
-							if(results.length == 0) {
-								return;
+					$.post('/update',dataArray,function (results) {
+							if(results) {
+								alert('数据修改成功！');
+								$.post('/query',function (results) {
+									if(results.length == 0) {
+										alert('未能查到正确数据!');
+										return;
+									}
+									clearTable();
+									$.each(results,function () {
+										createNew($(this)[0].customerNo,$(this)[0].customerName,
+											$(this)[0].telephone,$(this)[0].address,$(this)[0].zip);
+									});
+								});
 							}
-							clearTable();
-							$.each(results,function () {
-								createNew($(this)[0].customerNo,$(this)[0].customerName,
-									$(this)[0].telephone,$(this)[0].address,$(this)[0].zip);
-							});
 					});
 				return false;
 			});
