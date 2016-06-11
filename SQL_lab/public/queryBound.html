@@ -33,7 +33,10 @@
 				</ul>
 			</li>
 			<li>
-				<a href="queryBound.html">高级查询</a>
+				<a href="queryBound.html">订单查询</a>
+			</li>
+			<li>
+				<a href="deleteOrder.html">删除订单</a>
 			</li>
 			<li>
 				<a href="newOrder.html">新增订单</a>
@@ -45,24 +48,20 @@
 			<nav>
 				<form id="query_form">
 					<div class="query_head">
-						<label>编号：</label>
-						<input type="text" name="customerNo">
-					</div>
-					<div class="query_head">
-						<label>名称：</label>
+						<label>客户名称：</label>
 						<input type="text" name="customerName">
 					</div>
 					<div class="query_head">
-						<label>电话：</label>
-						<input type="text" name="telephone">
+						<label>员工名称：</label>
+						<input type="text" name="employeeName">
 					</div>
 					<div class="query_head">
-						<label>地址：</label>
-						<input type="text" name="address">
+						<label>商品名称：</label>
+						<input type="text" name="productName">
 					</div>
 					<div class="query_head">
-						<label>邮编：</label>
-						<input type="text" name="zip">
+						<label>订单号：</label>
+						<input type="text" name="orderNo">
 					</div>
 					<div class="query_head">
 						<input type="button" value="查询" id="query">
@@ -72,11 +71,12 @@
 			<div id="customer_body">
 				<table>
 					<tr>
-						<th>编号</th>
-						<th>名称</th>
-						<th>电话</th>
-						<th>地址</th>
-						<th>邮编</th>
+						<th>订单号</th>
+						<th>产品名称</th>
+						<th>客户名称</th>
+						<th>服务员工</th>
+						<th>下单时间</th>
+						<th>总金额</th>
 					</tr>
 				</table>
 			</div>
@@ -92,15 +92,18 @@
 					for(var i in dataArray) {
 						dataArray[i].value = dataArray[i].value.trim();
 					}
-					$.post('/query',dataArray,function (results) {
+					$.post('/queryBound',dataArray,function (results) {
 							if(results.length == 0) {
 								alert('未能查到正确数据!');
 								return;
 							}
 							clearTable();
 							$.each(results,function () {
-								createNew($(this)[0].customerNo,$(this)[0].customerName,
-									$(this)[0].telephone,$(this)[0].address,$(this)[0].zip);
+								//处理日期只显示年月日
+								var dateFormat = $(this)[0].orderDate.split('T');
+								// console.log(dateFormat[0]);
+								createNew($(this)[0].orderNo,$(this)[0].productName,
+									$(this)[0].customerName,$(this)[0].employeeName,dateFormat[0],$(this)[0].orderSum);
 							});
 					});
 				return false;
@@ -110,8 +113,8 @@
 			var table = $('#customer_body > table');
 
 			//创建新的数据
-			function createNew(customerNo,customerName,telephone,address,zip) {
-				var tr = '<tr><td>'+customerNo+'</td><td>'+customerName+'</td><td>'+telephone+'</td><td>'+address+'</td><td>'+zip+'</td></tr>';
+			function createNew(orderNo,productName,customerName,employeeName,orderDate,orderSum) {
+				var tr = '<tr><td>'+orderNo+'</td><td>'+productName+'</td><td>'+customerName+'</td><td>'+employeeName+'</td><td>'+orderDate+'</td><td>'+orderSum+'</td></tr>';
 				table.append(tr);
 			}
 
@@ -119,7 +122,7 @@
 			function clearTable() {
 				table.find('tr').remove();
 				// alert(table.find('tr').html());
-				table.append('<tr><th>编号</th><th>名称</th><th>电话</th><th>地址</th><th>邮编</th></tr>');
+				table.append('<tr><th>订单号</th><th>订单名称</th><th>客户名称</th><th>服务员工</th><th>下单时间</th><th>总金额</th></tr>');
 			}
 		});
 	</script>

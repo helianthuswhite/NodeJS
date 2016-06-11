@@ -18,7 +18,10 @@ var query = require('./routes/query');
 //引入修改模块update.js
 var update = require('./routes/update');
 
-app.get('/index.html',function (req,res) {
+//引入订单查询模块
+var queryBound = require('./routes/queryBound');
+
+app.get('/',function (req,res) {
 	res.sendFile(__dirname + '/public/index.html');
 });
 
@@ -31,6 +34,12 @@ app.post('/query',urlencodedParser,function (req,res){
 app.post('/update',urlencodedParser,function(req,res){
 	update.post(req,res);
 });
+
+//处理订单查询请求
+app.post('/queryBound',urlencodedParser,function(req,res){
+	queryBound.post(req,res);
+});
+
 
 //服务器启动
 var server = app.listen(2333,function () {

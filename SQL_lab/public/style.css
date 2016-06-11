@@ -99,6 +99,7 @@ body {
 }
 #body #customer #query_form{
 	position: relative;
+	width: auto;
 }
 #body #query_form .query_head {
 	position: relative;
@@ -146,8 +147,9 @@ body {
 }
 footer {
 	position: absolute;
-	bottom: 10px;
+	/*width: 241px;*/
 	left: 50%;
+	/*bottom: 15px;*/
 	margin-left: -120px;
 }
 
