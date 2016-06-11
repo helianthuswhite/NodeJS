@@ -145,6 +145,15 @@ body {
 	text-align: center;
 	border-bottom: solid 1px #006400;
 }
+#body #customer_body #delete {
+	color: #006400;
+}
+#body #customer_body #delete:hover {
+	color: #FD8B50;
+}
+#body #customer_body #delete:active {
+	color: #006400;
+}
 footer {
 	position: absolute;
 	/*width: 241px;*/

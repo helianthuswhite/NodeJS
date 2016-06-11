@@ -10,11 +10,6 @@ app.use(express.static(path.join(__dirname,'/public')));
 var mysql = require('mysql');
 
 var DATABASE = 'OrderDB';  
-var Customer = 'Customer';
-var Employee = 'Employee';
-var OrderMaster = 'OrderMaster';
-var Product = 'Product';
-var OrderDetail = 'OrderDetail';
 
 //创建连接  
 var client = mysql.createConnection({  

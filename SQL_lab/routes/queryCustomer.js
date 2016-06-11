@@ -19,7 +19,7 @@ var client = mysql.createConnection({
 });  
 client.connect();
 
-var Query = {
+var QueryCustomer = {
 	post:function(req,res) {
 		//输出JSON格式
 		response = {
@@ -79,4 +79,4 @@ function query (args,res) {
   	}); 
 }
 
-module.exports = Query;
+module.exports = QueryCustomer;

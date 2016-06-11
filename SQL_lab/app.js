@@ -13,7 +13,7 @@ var path = require('path');
 app.use(express.static(path.join(__dirname,'/public')));
 
 //引入查询模块query.js
-var query = require('./routes/query');
+var queryCustomer = require('./routes/queryCustomer');
 
 //引入修改模块update.js
 var update = require('./routes/update');
@@ -21,13 +21,17 @@ var update = require('./routes/update');
 //引入订单查询模块
 var queryBound = require('./routes/queryBound');
 
+//删除订单时的订单查询模块
+var queryOrder = require('./routes/queryOrder');
+var deleteOrder = require('./routes/deleteOrder');
+
 app.get('/',function (req,res) {
 	res.sendFile(__dirname + '/public/index.html');
 });
 
 //处理query请求
 app.post('/query',urlencodedParser,function (req,res){
-	query.post(req,res);
+	queryCustomer.post(req,res);
 });
 
 //处理update请求
@@ -38,6 +42,14 @@ app.post('/update',urlencodedParser,function(req,res){
 //处理订单查询请求
 app.post('/queryBound',urlencodedParser,function(req,res){
 	queryBound.post(req,res);
+});
+
+//处理删除订单中的订单查询请求
+app.post('/queryOrder',urlencodedParser,function(req,res){
+	queryOrder.post(req,res);
+});
+app.post('/deleteOrder',urlencodedParser,function(req,res){
+	deleteOrder.post(req,res);
 });
 
 
