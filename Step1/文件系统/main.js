@@ -10,7 +10,7 @@ fs.writeFile('input.txt','我是通过写入的文件内容！',function (err) {
 })
 
 //*************异步和同步获取文件************/
-fs.readFile('inpuut.txt',function(err,data) {
+fs.readFile('input.txt',function(err,data) {
 	if(err) {
 		return console.error(err);
 	}
