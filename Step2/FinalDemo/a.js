@@ -1,0 +1,1 @@
+console.log('啦啦啦，我是a.js');
