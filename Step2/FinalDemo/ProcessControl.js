@@ -6,6 +6,7 @@ var worker;
 // 创建子进程
 function spawn(server, config) {
     worker = cp.spawn('node', [ server, config ]);
+    console.log('启动成功！');
     // 意外退出，重启
     worker.on('exit', function (code) {
         if (code !== 0) {

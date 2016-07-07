@@ -77,7 +77,7 @@ function outputFiles(pathnames, writer) {
         if (i < len) {
             // 通过数据流输出，减少内存压力
             var reader = fs.createReadStream(pathnames[i]);
-
+            //TODO字符编码问题
             reader.pipe(writer, { end: false });
             reader.on('end', function() {
                 next(i + 1, len);
@@ -108,4 +108,4 @@ function validateFiles(pathnames, callback) {
     }(0, pathnames.length));
 }
 
-
+main(process.argv.slice(2));
