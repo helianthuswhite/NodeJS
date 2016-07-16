@@ -23,3 +23,10 @@ NodeJS学习
 感觉这个教程内容讲的更底层，对思想和理解上很有帮助，更深入的理解了回调函数机制
 
 学习网址：http://nqdeng.github.io/7-days-nodejs/
+
+## Step3
+学习NodeJS官方文档，了解和熟悉Node各个对象和方法的使用情况
+
+通过看官方文档，系统的学习各个函数的使用，同时对Node的各种机制有所了解，比如V8引擎的解析，C与C++函数函数的调用等等
+
+学习网址：http://nodejs.cn/doc/node/buffer.html
