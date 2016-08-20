@@ -30,3 +30,7 @@ NodeJS学习
 通过看官方文档，系统的学习各个函数的使用，同时对Node的各种机制有所了解，比如V8引擎的解析，C与C++函数函数的调用等等
 
 学习网址：http://nodejs.cn/doc/node/buffer.html
+
+## Server.js
+这是一个node本地静态服务器，可以帮助你在另一台电脑上进行前端的代码调试
+
