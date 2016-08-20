@@ -20,7 +20,7 @@ http.createServer(function (request,response) {
 	if (route == ''||route == null) {
 		route = 'index.html';
 	}
-	var URL = '/Users/W_littlewhite/Documents/Git/NodeJS/Step1/WebServer/' + route;
+	var URL = __dirname + '/' + route;
 
 	//从文件系统中读取请求的文件内容
 	fs.readFile(URL,function (err,data) {
@@ -39,6 +39,5 @@ http.createServer(function (request,response) {
 
 //控制台输出信息
 console.log('Server running at http://127.0.0.1:2333');
-
 
 
