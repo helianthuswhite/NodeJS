@@ -6,35 +6,38 @@
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
+var path = require('path');
+var mime = require('mime');
 
 //创建服务器
-http.createServer(function (request,response) {
+http.createServer(function (req,res) {
 	// 解析请求
-	var pathname = url.parse(request.url).pathname;
-
-	//输出请求的文件名
-	console.log('Request for '+ pathname + ' received.');
+	var pathname = url.parse(req.url).pathname;
 
 	var route = pathname.substr(1);
 
 	if (route == ''||route == null) {
 		route = 'index.html';
 	}
-	var URL = __dirname + '/' + route;
+	var URL = __dirname + '/'+ route;
 
-	//从文件系统中读取请求的文件内容
-	fs.readFile(URL,function (err,data) {
-		if(err) {
-			console.log(err);
-			response.writeHead(404,{'Content-Type':'text/html'});
-		}else {
-			response.writeHead(200,{'Content-Type':'text/html'});
-			//响应文件内容
-			response.write(data.toString());
-		}
-		//发送响应数据
-		response.end();
-	});
+	fs.exists(URL,function(err){
+        if(!err){
+            send404(res);
+        }else{
+            fs.readFile(URL,function(err,data){
+                if(err){
+                    console.log(err);
+					response.writeHead(404,{'Content-Type':'text/html'});
+                }else{
+                    res.writeHead(200,{'content-type':mime.lookup(URL)});
+                    console.log(mime.lookup(URL));
+                    res.end(data.toString());
+                }
+            });//fs.readfile
+        }
+    })//path.exists
+	
 }).listen(2333);
 
 //控制台输出信息
