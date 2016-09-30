@@ -10,13 +10,6 @@ NodeJS学习
 
 学习网址：http://www.runoob.com/nodejs/nodejs-tutorial.html
 
-## SQL_lab
-《数据库系统》课程的一个编程实验，要求使用动态SQL语句操作数据库
-
-在学习完Step1后仿照express收发表单的部分写了一个node的简单网站demo
-
-全局使用ajax传递数据，对node程序的简单结构更加了解
-
 ## Step2
 学习《7-days-nodejs》，对整个node环境进行更加详细的了解并且学习一些基本的操作
 
@@ -31,6 +24,15 @@ NodeJS学习
 
 学习网址：http://nodejs.cn/doc/node/buffer.html
 
+## SQL_lab
+《数据库系统》课程的一个编程实验，要求使用动态SQL语句操作数据库
+
+在学习完Step1后仿照express收发表单的部分写了一个node的简单网站demo
+
+全局使用ajax传递数据，对node程序的简单结构更加了解
+
 ## Server.js
 这是一个node本地静态服务器，可以帮助你在另一台电脑上进行前端的代码调试
 
+## Compilers 
+编译原理实验，包括词法分析器、语法分析器、语义分析器
