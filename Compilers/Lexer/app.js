@@ -145,9 +145,9 @@ function tokenizer(ch) {
 		}
 		else if (currentState == 'B') {
 			if (ch == '_'||__letterSet__.indexOf(ch) > -1||__digitSet__.indexOf(ch) > -1) {
-				buf = buf+ch
-                currentState = 'B'
-                return
+				buf = buf+ch;
+                currentState = 'B';
+                return;
 			}   
             else {
             	if (__keywordSet__.indexOf(buf) > -1) {
@@ -163,25 +163,127 @@ function tokenizer(ch) {
                 continue;
             }
 		}
-		else if (currentState == 'B') {
-			if (ch == '_'||__letterSet__.indexOf(ch) > -1||__digitSet__.indexOf(ch) > -1) {
-				buf = buf+ch
-                currentState = 'B'
-                return
+		else if (currentState == 'C') {
+			if (__digitSet__.indexOf(ch) > -1) {
+				buf = buf+ch;
+                currentState = 'C';
+                return;
 			}   
-            else {
-            	if (__keywordSet__.indexOf(buf) > -1) {
-            		console_msg = console_msg + '('+buf+' , 关键字)\n';
-                    // result.append(buf);
-            	}  
-                else {
-                	console_msg = console_msg + '('+buf+' , 标识符)\n';
-                    result.append('IDN');
-                } 
-                buf = '';
-                currentState = 'A';
-                continue;
+            else if (ch == '.'){
+            	buf = buf + ch;
+                currentState = 'P';
+                return;
             }
-		}
+            else {
+            	console_msg = console_msg + '(' + buf + ' , 整数常量)\n';
+            	// result.append('INUM');
+            	buf = '';
+            	currentState = 'A';
+            	continue;
+            }
+        }
+        else if (currentState = 'D') {
+        	if (ch != '\''&&ch != '\\') {
+        		buf = buf + ch;
+        		currentState = 'E';
+        		return;
+        	}
+        	else if (ch != '\''&&ch == '\\') {
+        		buf = buf + ch;
+        		currentState = 'F';
+        		return;
+        	}
+        	else {
+        		compilerFail('空白或无效的字符');
+        		return;
+        	}
+        }
+        else if (currentState == 'E') {
+        	if(ch == '\'') {
+        		buf = buf +ch;
+        		currentState = 'H';
+        		continue;
+        	}
+        	else {
+        		compilerFail('字符常量长度大于一');
+        		return;
+        	}
+        }
+        else if (currentState == 'H') {
+        	console_msg = console_msg + '(' + buf + ' , 字符常量)\n';
+        	// result.append('CH');
+        	buf = '';
+        	currentState = 'A';
+        	return;
+        }
+        else if (currentState == 'F') {
+        	if(__switchCharSet__.indexOf(ch) > -1) {
+        		buf = buf + ch;
+        		currentState = 'E';
+        		return;
+        	}
+      		else {
+      			compilerFail('无效的转义字符');
+      			return;
+      		}
+        }
+        else if (currentState == 'G') {
+        	if(ch != '\"'&&ch != '\\') {
+        		buf = buf + ch;
+        		currentState = 'G';
+        		return;
+        	}
+        	else if (ch != '\''&&ch == '\\') {
+        		buf = buf + ch;
+        		currentState = 'I';
+        		return;
+        	}
+        	else if (ch == '\"') {
+        		buf = buf + ch;
+        		currentState = 'J';
+        	}
+        }
+        else if (currentState == 'I') {
+        	if (__switchCharSet__.indexOf(ch) > -1) {
+        		buf = buf + ch;
+        		currentState = 'G';
+        		return;
+        	}
+        	else {
+        		compilerFail('无效的转义字符');
+        		return;
+        	}
+        }
+        else if (currentState == 'J') {
+        	console_msg = console_msg + '(' + buf + ' , 字符串常量)\n';
+        	// result.append('STR');
+        	buf = '';
+        	currentState = 'A';
+        	return;
+        }
+        else if (currentState == 'K') {
+        	if (ch == '*') {
+        		buf = buf[buf.length - 1];
+        		currentState = 'L';
+        		return;
+        	}
+        	else if (ch == '/') {
+        		buf = buf[buf.length - 1];
+        		currentState = 'O';
+        		return;
+        	}
+        	else if (ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B=';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 运算符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
 	}
 }
