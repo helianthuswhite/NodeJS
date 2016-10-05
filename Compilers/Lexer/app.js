@@ -285,5 +285,287 @@ function tokenizer(ch) {
         		continue;
         	}
         }
+        else if (currentState == 'L') {
+        	if (ch != '*') {
+        		currentState = 'L';
+        		return;
+        	}
+        	else if (ch == '*') {
+        		currentState = 'M';
+        		return;
+        	}
+        }
+        else if (currentState == 'M') {
+        	if (ch == '/') {
+        		currentState = 'N';
+        		return;
+        	}
+        	else {
+        		currentState = 'L';
+        	}
+        }
+        else if (currentState == 'N') {
+        	currentState = 'A';
+        	return;
+        }
+        else if (currentState == 'O') {
+        	if (ch == '\n') {
+        		currentState = 'A';
+        		return;
+        	}
+        	else {
+        		currentState = 'O';
+        		return;
+        	}
+        }
+        else if (currentState == 'P') {
+        	if (__digitSet__.indexOf(ch) > -1) {
+        		buf = buf + ch;
+        		currentState = 'Q';
+        		return;
+        	}
+        	else {
+        		compilerFail('无效的转义字符');
+        		return;
+        	}
+        }
+        else if (currentState == 'Q') {
+        	if (__digitSet__.indexOf(ch)) {
+        		buf = buf + ch;
+        		currentState = 'Q';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 浮点数常量)\n';
+        		// result.append('FNUM');
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'A+') {
+        	if (ch == '+'||ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B+';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B+') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A-') {
+        	if (ch == '-'||ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B-';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B-') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A*') {
+        	if (ch == '*'||ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B*';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B*') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A&') {
+        	if (ch == '&'||ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B&';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B&') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A^') {
+        	if (ch == '^'||ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B^';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B^') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A|') {
+        	if (ch == '|'||ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B|';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B|') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A=') {
+        	if (ch == '=') {
+        		buf = buf + ch;
+        		currentState = 'B=';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B=') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A!') {
+        	if (ch == '!') {
+        		buf = buf + ch;
+        		currentState = 'B!';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B!') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A>') {
+        	if (ch == '>') {
+        		buf = buf + ch;
+        		currentState = 'B>';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B>') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == 'A<') {
+        	if (ch == '<') {
+        		buf = buf + ch;
+        		currentState = 'B<';
+        		return;
+        	}
+        	else {
+        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        		// result.append(buf);
+        		buf = '';
+        		currentState = 'A';
+        		continue;
+        	}
+        }
+        else if (currentState == 'B<') {
+        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	continue;
+        }
+        else if (currentState == '$') {
+        	console_msg = console_msg + '(' + buf + ' , 终结符)\n';
+        	// result.append(buf);
+        	buf = '';
+        	currentState = 'A';
+        	return;
+        }
 	}
+}
+
+function compilerFail(status) {
+	console_msg = console_msg + '编译于第' + mRow.toString() + '行，第'
+		 + mLine.toString() + '列失败，是因为：' + status + '\n';
+	currentState = 'A';
+	buf = '';
 }
