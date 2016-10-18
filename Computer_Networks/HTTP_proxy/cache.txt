@@ -1,0 +1,5 @@
+
+http://ipinfo.io/static/dist/index.css
+http://ipinfo.io/static/flags.css
+http://ipinfo.io/static/banner.css
+http://ipinfo.io/static/dist/index.js
