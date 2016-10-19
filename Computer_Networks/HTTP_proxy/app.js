@@ -4,6 +4,15 @@ var fs = require('fs');
 var parseHosts = require('./parseHost');
 var TipInfo = require('./tips');
 var parseIp = require('./parseIp');
+
+const cacheType = [
+    '.css',
+    '.js',
+    '.svg',
+    '.png',
+    '.jpg',
+    '.jpeg'
+];
   
 function createServer(HOST,PORT) {
     net.createServer(function(sock) {  
@@ -94,14 +103,18 @@ function sendRemote(HOST,PORT,data,callback) {
 }
 
 function cacheProcess(remoteInfo,rawData) {
+    // 读取缓存url的文件
     fs.readFile(__dirname + '/cache.txt',function (err,data) {
         if(err) {
             console.log(err);
         }
         var cacheUrls = data.toString().split('\n');
+        // 有缓存的情况下
         if(cacheUrls.indexOf(remoteInfo.URL) >= 0 && rawData.toString().indexOf('If-Modified-Since') == -1) {
             var tempArr = rawData.toString().split('\r\n\r\n');
+            // 添加If-Modified-Since请求头
             var newHeader = tempArr[0] + '\r\nIf-Modified-Since: ' + (new Date()).toGMTString() + '\r\n\r\n';
+            // 发送请求，判断缓存是否最新
             sendRemote(remoteInfo.HOST,remoteInfo.PORT,newHeader,function (data) {
                 var patt = /Last-Modified: (.*)\r\n/;
                 var arr = data.toString().match(patt);
@@ -109,6 +122,22 @@ function cacheProcess(remoteInfo,rawData) {
                     console.log(arr[1]);
                 }
             });
+        // 完全没有缓存的情况
+        }else {
+            for (var i = 0; i < cacheType.length; i++) {
+                if(remoteInfo.URL.indexOf(cacheType[i]) > 0) {
+                    var name = remoteInfo.URL.split('/');
+                    // console.log(name);
+                    sendRemote(remoteInfo.HOST,remoteInfo.PORT,rawData,function (data) {
+                        fs.writeFile(__dirname + '/caches/' + name[name.length - 1],data.toString(),function (err) {
+                            if(err) {
+                                console.log(err);
+                            }
+                            console.log('数据缓存已完成。');
+                        });
+                    });
+                }
+            }
         }
     });
 }
