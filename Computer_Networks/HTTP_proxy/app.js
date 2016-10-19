@@ -13,7 +13,8 @@ const cacheType = [
     '.jpg',
     '.jpeg'
 ];
-  
+
+// 创建服务器
 function createServer(HOST,PORT) {
     net.createServer(function(sock) {  
   
@@ -67,16 +68,20 @@ function createServer(HOST,PORT) {
 
 }
 
+// 获得远程请求的信息
 function getRemoteInfo(dataStr) {
     var remoteInfo = {
         HOST:'',
         PORT:'',
         URL:''
     };
+    // 获得主机信息
     var hostArr = dataStr.split('\r\n')[1].split(':');
     remoteInfo.HOST = hostArr[1].replace(/\s+/g,'');
+    // 获得URL信息
     var urlArr = dataStr.split('\r\n')[0].split(' ');
     remoteInfo.URL = urlArr[1];
+    // 如果有端口变化则改变，否则默认为80
     if (hostArr[2]) {
         remoteInfo.PORT = hostArr[2];
     }else {
@@ -85,59 +90,89 @@ function getRemoteInfo(dataStr) {
     return remoteInfo;
 }
 
+// socket客户端发送请求
 function sendRemote(HOST,PORT,data,callback) {
 
     var client = new net.Socket(); 
+    var dataArr = [];
+    // 建立连接并且发送数据
     client.connect(PORT, HOST, function() {  
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);    
-        client.write(data);
+        client.end(data);
     });  
-       
+    // 将连续的数据存入内容最后合并
     client.on('data', function(data) {  
-        callback(data);
+        dataArr.push(data);
     });  
-      
-    client.on('close', function() {  
-        console.log('Connection closed');  
+    // 请求完成之后执行回调函数
+    client.on('end', function() {  
+        callback(Buffer.concat(dataArr)); 
     });  
 }
 
+// 缓存处理函数
 function cacheProcess(remoteInfo,rawData) {
     // 读取缓存url的文件
     fs.readFile(__dirname + '/cache.txt',function (err,data) {
         if(err) {
             console.log(err);
         }
-        var cacheUrls = data.toString().split('\n');
+        var cacheRow = data.toString().split('\n');
+        var cacheUrls = [];
+        var cacheDate = [];
+        // 将cache.txt中的内容存入数组
+        for (var i = 0; i < cacheRow.length; i++) {
+            cacheUrls.push(cacheRow[i].split('Last-Modified:')[0]);
+            cacheDate.push(cacheRow[i].split('Last-Modified:')[1]);
+        }
         // 有缓存的情况下
         if(cacheUrls.indexOf(remoteInfo.URL) >= 0 && rawData.toString().indexOf('If-Modified-Since') == -1) {
             var tempArr = rawData.toString().split('\r\n\r\n');
             // 添加If-Modified-Since请求头
-            var newHeader = tempArr[0] + '\r\nIf-Modified-Since: ' + (new Date()).toGMTString() + '\r\n\r\n';
+            var newHeader = tempArr[0] + '\r\nIf-Modified-Since: ' + cacheDate[cacheUrls.indexOf(remoteInfo.URL)] + '\r\n\r\n';
             // 发送请求，判断缓存是否最新
             sendRemote(remoteInfo.HOST,remoteInfo.PORT,newHeader,function (data) {
+                // 获取到远程返回的Last-Modified值
                 var patt = /Last-Modified: (.*)\r\n/;
                 var arr = data.toString().match(patt);
-                if(arr) {
-                    console.log(arr[1]);
+                // 如果发现缓存更新则需要执行缓存操作
+                if(arr[1] > cacheDate[cacheUrls.indexOf(remoteInfo.URL)]) {
+                    cacheStart(remoteInfo,newHeader);
+                }else {
+                    console.log('本地缓存已是最新的。');
                 }
             });
         // 完全没有缓存的情况
         }else {
+            // 循环缓存不同类型文件
             for (var i = 0; i < cacheType.length; i++) {
+                // 如果是需要缓存的类型则进行缓存
                 if(remoteInfo.URL.indexOf(cacheType[i]) > 0) {
-                    var name = remoteInfo.URL.split('/');
-                    // console.log(name);
-                    sendRemote(remoteInfo.HOST,remoteInfo.PORT,rawData,function (data) {
-                        fs.writeFile(__dirname + '/caches/' + name[name.length - 1],data.toString(),function (err) {
-                            if(err) {
-                                console.log(err);
-                            }
-                            console.log('数据缓存已完成。');
-                        });
-                    });
+                    cacheStart(remoteInfo,rawData);
                 }
             }
+        }
+    });
+}
+
+// 缓存执行函数
+function cacheStart(remoteInfo,rawData) {
+    // 获取文件名称
+    var name = remoteInfo.URL.split('/');
+    // 发送远程请求
+    sendRemote(remoteInfo.HOST,remoteInfo.PORT,rawData,function (data) {
+        var deHeader = data.toString().split('\r\n\r\n');
+        // 获得Last-Modified的值
+        var patt = /Last-Modified: (.*)\r\n/;
+        var arr = data.toString().match(patt);
+        // 创建新的buffer来存返回的消息体
+        var buf = Buffer.alloc(data.length - deHeader[0].length - 4);
+        // 如果消息体有数据并且需要缓存则执行
+        if (data.toString().indexOf('Content-Length') > 0 && deHeader[0].indexOf('Last-Modified') > 0) {
+            // 将文件的内容缓存到本地对应文件中
+            data.copy(buf,0,deHeader[0].length + 4);
+            fs.writeFileSync(__dirname + '/caches/' + name[name.length - 1],buf);
+            fs.writeFileSync(__dirname + '/cache.txt',remoteInfo.URL + 'Last-Modified:' + arr[1] +'\n',{flag:'a'});
         }
     });
 }
