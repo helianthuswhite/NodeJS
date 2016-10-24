@@ -19,17 +19,9 @@ var buf = '',
                 'while','static'
                 ],
 	boardSet = [';',',', '(', ')', '.', '{', '}','[',']'],
-	console_msg = '',
+	console_msg = [],
 	TOKENIZE_SUCCESS = 0,
 	TOKEN_ERROR = 1;
-
-fs.readFile(__dirname + '/test.c',function(err,data) {
-	if(err) {
-		return console.error(err);
-	}
-	scanner(data.toString());
-	console.log(console_msg);
-});
 
 function scanner(data) {
 	for (var i in data) {
@@ -40,7 +32,7 @@ function scanner(data) {
 			mLine = 0;
 		}
 	}
-	tokenizer('$');
+	// tokenizer('$');
 }
 
 function tokenizer(ch) {
@@ -127,7 +119,14 @@ function tokenizer(ch) {
 			}
 			else if (boardSet.indexOf(ch) > -1) {
 				buf = '';
-				console_msg = console_msg + '(' + ch + ' , 界符)\n';
+				console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:true,
+                    token:'界符',
+                    error:'——'
+                });
 				currentState = 'A';
 				return;
 			}
@@ -136,7 +135,14 @@ function tokenizer(ch) {
 				currentState = '$';
 			}
 			else {
-				compilerFail('不可识别的字符');
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:false,
+                    token:'——',
+                    error:'不可识别的字符'
+                });
 				return;
 			}
 		}
@@ -148,10 +154,24 @@ function tokenizer(ch) {
 			}   
             else {
             	if (keywordSet.indexOf(buf) > -1) {
-            		console_msg = console_msg + '('+buf+' , 关键字)\n';
+                    console_msg.push({
+                        line:mLine,
+                        row:mRow,
+                        char:ch,
+                        isSuccess:true,
+                        token:'关键字',
+                        error:'——'
+                    });
             	}  
                 else {
-                	console_msg = console_msg + '('+buf+' , 标识符)\n';
+                    console_msg.push({
+                        line:mLine,
+                        row:mRow,
+                        char:ch,
+                        isSuccess:true,
+                        token:'标识符',
+                        error:'——'
+                    });
                 } 
                 buf = '';
                 currentState = 'A';
@@ -170,7 +190,14 @@ function tokenizer(ch) {
                 return;
             }
             else {
-            	console_msg = console_msg + '(' + buf + ' , 整数常量)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:true,
+                    token:'整数常量',
+                    error:'——'
+                });
             	buf = '';
             	currentState = 'A';
             	continue;
@@ -188,7 +215,14 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		compilerFail('空白或无效的字符');
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:false,
+                    token:'——',
+                    error:'空白或无效的字符'
+                });
         		return;
         	}
         }
@@ -199,12 +233,26 @@ function tokenizer(ch) {
         		continue;
         	}
         	else {
-        		compilerFail('字符常量长度大于一');
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:false,
+                    token:'——',
+                    error:'字符常量长度大于一'
+                });
         		return;
         	}
         }
         else if (currentState == 'H') {
-        	console_msg = console_msg + '(' + buf + ' , 字符常量)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:true,
+                    token:'字符常量',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	return;
@@ -216,7 +264,14 @@ function tokenizer(ch) {
         		return;
         	}
       		else {
-      			compilerFail('无效的转义字符');
+      			console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:false,
+                    token:'——',
+                    error:'无效的转义字符'
+                });
       			return;
       		}
         }
@@ -243,12 +298,26 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		compilerFail('无效的转义字符');
-        		return;
+        		console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:ch,
+                    isSuccess:false,
+                    token:'——',
+                    error:'无效的转义字符'
+                });        		
+                return;
         	}
         }
         else if (currentState == 'J') {
-        	console_msg = console_msg + '(' + buf + ' , 字符串常量)\n';
+        	console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:false,
+                    token:'——',
+                    error:'字符串常量'
+                }); 
         	buf = '';
         	currentState = 'A';
         	return;
@@ -538,3 +607,13 @@ function compilerFail(status) {
 	currentState = 'A';
 	buf = '';
 }
+
+var lexer = {
+    start:function(req,res) {
+        var data = req.body.data;
+        scanner(data);
+        console.log(console_msg);
+    }
+};
+
+module.exports = lexer;

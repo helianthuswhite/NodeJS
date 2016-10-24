@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>数据库编程实验</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div id="head">
+		<h1>数据库实验三——NodeJS系统</h1>
+		<div class="user">
+			<span>欢迎您：W_littlewhite</span>
+			<a href="index.html">退出系统</a>
+		</div>
+	</div>
+	<nav id="head_nav">
+		<img src="image/white.png">
+		<ul>
+			<li class="menu"><a href="javascript:void(0);">查询信息</a>
+				<ul>
+					<li><a href="queryCustomer.html">客户查询</a></li>
+					<li><a href="queryProduct.html">产品信息</a></li>
+					<li><a href="queryOrderMaster.html">订单详情</a></li>
+					<li><a href="queryEmployee.html">员工信息</a></li>
+				</ul>
+			</li>
+			<li class="menu">
+				<a href="javascript:void(0);">修改信息</a>
+				<ul>
+					<li><a href="updateCustomer.html">修改客户信息</a></li>
+					<li><a href="updateProduct.html">修改产品信息</a></li>
+					<li><a href="updateEmployee.html">修改员工信息</a></li>
+				</ul>
+			</li>
+			<li>
+				<a href="queryBound.html">订单查询</a>
+			</li>
+			<li>
+				<a href="deleteOrder.html">删除订单</a>
+			</li>
+			<li>
+				<a href="newOrder.html">新增订单</a>
+			</li>
+		</ul>
+	</nav>
+	<div id="body">
+		<section id="customer">
+			<nav>
+				<form id="query_form">
+					<div class="query_head">
+						<label>客户名称：</label>
+						<input type="text" name="customerName">
+					</div>
+					<div class="query_head">
+						<label>员工名称：</label>
+						<input type="text" name="employeeName">
+					</div>
+					<div class="query_head">
+						<label>商品名称：</label>
+						<input type="text" name="productName">
+					</div>
+					<div class="query_head">
+						<label>订单号：</label>
+						<input type="text" name="orderNo">
+					</div>
+					<div class="query_head">
+						<input type="button" value="查询" id="query">
+					</div>
+				</form>
+			</nav>
+			<div id="customer_body">
+				<table>
+					<tr>
+						<th>订单号</th>
+						<th>产品名称</th>
+						<th>客户名称</th>
+						<th>服务员工</th>
+						<th>下单时间</th>
+						<th>总金额</th>
+					</tr>
+				</table>
+			</div>
+		</section>
+	</div>
+	<footer> © HuangYunzhi Copyright Reserved</footer>
+	<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#query').click(function () {
+					var dataArray = $('#query_form').serializeArray();
+					// console.log(dataArray[0].value);
+					for(var i in dataArray) {
+						dataArray[i].value = dataArray[i].value.trim();
+					}
+					$.post('/queryBound',dataArray,function (results) {
+							if(results.length == 0) {
+								alert('未能查到正确数据!');
+								return;
+							}
+							clearTable();
+							$.each(results,function () {
+								//处理日期只显示年月日
+								var dateFormat = $(this)[0].orderDate.split('T');
+								// console.log(dateFormat[0]);
+								createNew($(this)[0].orderNo,$(this)[0].productName,
+									$(this)[0].customerName,$(this)[0].employeeName,dateFormat[0],$(this)[0].orderSum);
+							});
+					});
+				return false;
+			});
+
+			//获取table
+			var table = $('#customer_body > table');
+
+			//创建新的数据
+			function createNew(orderNo,productName,customerName,employeeName,orderDate,orderSum) {
+				var tr = '<tr><td>'+orderNo+'</td><td>'+productName+'</td><td>'+customerName+'</td><td>'+employeeName+'</td><td>'+orderDate+'</td><td>'+orderSum+'</td></tr>';
+				table.append(tr);
+			}
+
+			//销毁表格中的已有数据
+			function clearTable() {
+				table.find('tr').remove();
+				// alert(table.find('tr').html());
+				table.append('<tr><th>订单号</th><th>订单名称</th><th>客户名称</th><th>服务员工</th><th>下单时间</th><th>总金额</th></tr>');
+			}
+		});
+	</script>
+</body>
+</html>
