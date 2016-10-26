@@ -1,6 +1,4 @@
 
-var fs = require('fs');
-
 var buf = '',
 	mLine = 1,
 	mRow = 0,
@@ -19,9 +17,15 @@ var buf = '',
                 'while','static'
                 ],
 	boardSet = [';',',', '(', ')', '.', '{', '}','[',']'],
-	console_msg = [],
-	TOKENIZE_SUCCESS = 0,
-	TOKEN_ERROR = 1;
+	console_msg = [];
+
+function init() {
+    buf = '',
+    mLine = 1,
+    mRow = 0,
+    currentState = 'A',
+    console_msg = [];
+}
 
 function scanner(data) {
 	for (var i in data) {
@@ -32,7 +36,7 @@ function scanner(data) {
 			mLine = 0;
 		}
 	}
-	// tokenizer('$');
+	tokenizer('$');
 }
 
 function tokenizer(ch) {
@@ -157,7 +161,7 @@ function tokenizer(ch) {
                     console_msg.push({
                         line:mLine,
                         row:mRow,
-                        char:ch,
+                        char:buf,
                         isSuccess:true,
                         token:'关键字',
                         error:'——'
@@ -167,7 +171,7 @@ function tokenizer(ch) {
                     console_msg.push({
                         line:mLine,
                         row:mRow,
-                        char:ch,
+                        char:buf,
                         isSuccess:true,
                         token:'标识符',
                         error:'——'
@@ -193,7 +197,7 @@ function tokenizer(ch) {
                 console_msg.push({
                     line:mLine,
                     row:mRow,
-                    char:ch,
+                    char:buf,
                     isSuccess:true,
                     token:'整数常量',
                     error:'——'
@@ -248,7 +252,7 @@ function tokenizer(ch) {
             console_msg.push({
                     line:mLine,
                     row:mRow,
-                    char:ch,
+                    char:buf,
                     isSuccess:true,
                     token:'字符常量',
                     error:'——'
@@ -339,7 +343,14 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 运算符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'运算符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
@@ -385,7 +396,14 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		compilerFail('无效的转义字符');
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:false,
+                    token:'——',
+                    error:'无效的转义字符'
+                });
         		return;
         	}
         }
@@ -396,7 +414,14 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 浮点数常量)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'浮点数常量',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
@@ -409,14 +434,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B+') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -428,14 +467,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B-') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -447,14 +500,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B*') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -466,14 +533,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B&') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -485,14 +566,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B^') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -504,14 +599,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B|') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -523,14 +632,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B=') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -542,14 +665,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B!') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -561,14 +698,28 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B>') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
@@ -580,20 +731,41 @@ function tokenizer(ch) {
         		return;
         	}
         	else {
-        		console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+                console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         		buf = '';
         		currentState = 'A';
         		continue;
         	}
         }
         else if (currentState == 'B<') {
-        	console_msg = console_msg + '(' + buf + ' , 操作符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'操作符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	continue;
         }
         else if (currentState == '$') {
-        	console_msg = console_msg + '(' + buf + ' , 终结符)\n';
+            console_msg.push({
+                    line:mLine,
+                    row:mRow,
+                    char:buf,
+                    isSuccess:true,
+                    token:'终结符',
+                    error:'——'
+                });
         	buf = '';
         	currentState = 'A';
         	return;
@@ -601,18 +773,12 @@ function tokenizer(ch) {
 	}
 }
 
-function compilerFail(status) {
-	console_msg = console_msg + '编译于第' + mRow.toString() + '行，第'
-		 + mLine.toString() + '列失败，是因为：' + status + '\n';
-	currentState = 'A';
-	buf = '';
-}
-
 var lexer = {
     start:function(req,res) {
+        init();
         var data = req.body.data;
         scanner(data);
-        console.log(console_msg);
+        res.send(console_msg);
     }
 };
 

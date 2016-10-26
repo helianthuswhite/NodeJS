@@ -101,6 +101,10 @@ body {
 	width: 100%;
 	height: 300px;
 	font-size: 16px;
+	line-height: 20px;
+	padding: 10px;
+	border: solid 1px #006400;
+	box-sizing: border-box;
 }
 #body #customer_head #lexer {
 	width: 120px;
@@ -152,6 +156,8 @@ body {
 #body #customer_body {
 	position: relative;
 	margin-top: 50px;
+	max-height: 600px;
+	overflow-y: scroll;
 }
 #body #customer_body table {
 	width: 100%;

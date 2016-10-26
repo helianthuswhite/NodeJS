@@ -58,8 +58,16 @@
 	</div>
 	<footer> © HuangYunzhi Copyright Reserved</footer>
 	<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="js/auto-line-number.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function () {
+			// 设置显示行号
+			$("#data").setTextareaCount({
+			    width: "30px",
+			   	bgColor: "#006400",
+			   	color: "#FFF",
+			   	display: "block"
+			});
 			$('#lexer').click(function () {
 					var data = {
 						data:$('#data').val()
@@ -71,14 +79,10 @@
 								return;
 							}
 							clearTable();
-							console.log(results);
-							// $.each(results,function () {
-							// 	//处理日期只显示年月日
-							// 	var dateFormat = $(this)[0].orderDate.split('T');
-							// 	// console.log(dateFormat[0]);
-							// 	createNew($(this)[0].orderNo,$(this)[0].productName,
-							// 		$(this)[0].customerName,$(this)[0].employeeName,dateFormat[0],$(this)[0].orderSum);
-							// });
+							$.each(results,function () {
+								createNew($(this)[0].row + 1,$(this)[0].line - 1,
+									$(this)[0].char,$(this)[0].isSuccess,$(this)[0].token,$(this)[0].error);
+							});
 					});
 			});
 

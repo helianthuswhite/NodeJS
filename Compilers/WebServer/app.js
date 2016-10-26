@@ -19,12 +19,10 @@ app.get('/',function (req,res) {
 });
 
 
-
 //处理query请求
 app.post('/lexer',urlencodedParser,function (req,res){
 	lexer.start(req,res);
 });
-
 
 
 //服务器启动
