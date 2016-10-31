@@ -1,67 +1,91 @@
+var dgram= require('dgram');
+var socket = dgram.createSocket('udp4');
+var Window = require('./window');
 
-var dgram = require("dgram");
-var socket = dgram.createSocket("udp4");
-var fs = require('fs');
+var winSize = 5;
+var seqSize = winSize + 1;
 
-var options = {
-	address:'127.0.0.1',
-	port:54321,
-	exclusice:false
-};
+// 储存发送窗口的信息
+var swindow = Window(winSize, seqSize);
+var data = '这是我的测试数据';
+var HOST = '127.0.0.1';
+var PORT = '12345';
+var TIMEOUT = 'timeout';
+// 超时时间
+var outtime = 1000 * 3;
+// 丢失概率
+var probability = 0;
+var index = 0;
 
-var count = 1;
-
-// socket.bind(options,function () {
-//   	socket.setBroadcast(true);
-// });
-
-// var message = new Buffer("Hi");
-// socket.send(message, 0, message.length, 12345, '127.0.0.1', function(err, bytes) {
-//   	if(err) socket.close();
-// });
-
-// socket.on("message", function (msg, rinfo) {
-// 	if (msg != ''&&msg != undefined) {
-// 		console.log('收到回复：' + msg);
-// 		var t = setInterval(function() {
-// 			if(count % 3 == 0) {
-// 				count++;
-// 				return;
-// 			}
-// 			var message_1 = new Buffer('Current Time:' + (new Date()).getHours() + ':' 
-// 		  		+ (new Date()).getMinutes() + ':' + (new Date()).getSeconds());
-// 		  	socket.send(message_1, 0, message_1.length, 12345, '127.0.0.1', function(err, bytes) {
-// 			  	if (err) socket.close();
-// 			});
-// 			if (msg.message != ''&&msg.message != undefined) {
-// 				var message_2 = new Buffer(msg.ack);
-// 				socket.send(message_2, 0, message_2.length, 12345, '127.0.0.1', function(err, bytes) {
-// 				  	if (err) socket.close();
-// 				});
-// 			}
-// 			clearInterval(t);
-// 			count++;
-// 		},1000);
-// 	}
-// });
-
-function sendMessage(message) {
-	socket.send(message, 0, message.length, 12345, '127.0.0.1', function(err) {
-		if(err) socket.close();
-	});
+function fillWindow () {
+    while (index < data.length) {
+        if (swindow.push(data[index])) {
+            index++;
+        } else {
+            break;
+    	}
+    }
 }
 
-function readFile() {
-	fs.readFile(__dirname + '/bg4.jpg',function (err,data) {
-		if(err) {
-			console.log(err);
-			return;
-		}
-		for (var i = 0; i < Buffer.byteLength(data)/1024; i++) {
-			var buf = Buffer.from(data).slice(i*1024,(i+1)*1024);
-			sendMessage(buf);
-		}
-	});
+function sendOne (seq, chunk) {
+    // 随机丢弃
+    if (Math.random() < probability) {
+        console.log(`==X seq: ${seq}, do not send ${chunk}\n`)
+    } else {
+        console.log(`==> seq: ${seq}, send out ${chunk}\n`)
+        var buf = Buffer.alloc(1)
+        buf.writeInt8(seq)
+        // 填入序号
+        chunk = Buffer.concat([buf, Buffer.from(chunk)])
+        socket.send(chunk, 0, chunk.length, PORT, HOST, (err) => {
+            if (err) socket.close()
+        })
+    }
 }
 
-readFile();
+function sendWindow () {
+    var windata = swindow.getData();
+    for (var item of windata) {
+        sendOne(item.seq, item.chunk);
+    }
+}
+
+// 定时重传
+function getTimer () {
+    return setInterval(function () {
+        console.log('== resend\n')
+        sendWindow();
+    }, outtime);
+}
+
+socket.on('message', function (msg, info) {
+    if (timer) {
+        clearInterval(timer);
+        timer = getTimer();
+    }
+    var ack = msg.readInt8();
+    msg = msg.slice(1);
+    console.log(`<== ${msg.toString()}, ack: ${ack}\n`);
+
+    if (swindow.ackLegal(ack)) {;
+        var length = swindow.minus(ack) + 1;
+        swindow.go(length);
+        if (ack === swindow.getCurr()) {
+            fillWindow();
+            if (swindow.isEmpty()) {
+                socket.close();
+                console.log(`finish!, time cost: ${Math.floor((new Date() - startTime) / 1000)}s`);
+                process.exit();
+            }
+            sendWindow();
+        }
+    }
+});
+
+socket.bind();
+
+var startTime = new Date();
+var timer = getTimer();
+
+fillWindow();
+sendWindow();
