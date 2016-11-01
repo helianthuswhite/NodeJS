@@ -48,6 +48,7 @@
 				</form>
 			</nav>
 			<div id="customer_body">
+				<p id='notice'>* 左边为UDP客户端数据，右边为UDP服务端数据</p>
 				<table id="client">
 					<tr>
 						<th>操作</th>
@@ -80,22 +81,20 @@
 						return;
 					}
 
-					var table = $('#customer_body #client');
-					clearTable(table);
-					$.each(results,function () {
-						createNew(table,$(this)[0].operate,$(this)[0].ack,
-							$(this)[0].data);
-					});
-
 					$.get('/gbnserver_protocol',function (results) {
 						if(results.length == 0) {
 							alert('服务器发生错误!');
 							return;
 						}
-
-						var table = $('#customer_body #server');
-						clearTable(table);
+						clearTable($('#customer_body > table'));
+						console.log(results);
 						$.each(results,function () {
+							if($(this)[0].table == 0) {
+								var table = $('#customer_body #client');
+							}else {
+
+								table = $('#customer_body #server');
+							}
 							createNew(table,$(this)[0].operate,$(this)[0].ack,
 								$(this)[0].data);
 						});

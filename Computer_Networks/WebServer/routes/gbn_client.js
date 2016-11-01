@@ -29,6 +29,7 @@ function sendOne (seq, chunk) {
     buf.writeInt8(seq);
     // 填入序号
     chunk = Buffer.concat([buf, Buffer.from(chunk)]);
+    console.log(`发送 seq: ${seq}, send out ${chunk}\n`)
     socket.send(chunk, 0, chunk.length, PORT, HOST, function (err) {
         if (err) socket.close();
         resData.push({
@@ -51,6 +52,7 @@ function sendWindow () {
 function getTimer () {
     return setInterval(function () {
         sendWindow();
+        console.log('重发 resend\n')
     }, outtime);
 }
 
@@ -61,6 +63,7 @@ socket.on('message', function (msg, info) {
     }
     var ack = msg.readInt8();
     msg = msg.slice(1);
+    console.log(` 返回 ${msg.toString()}, ack: ${ack}\n`);
     if (swindow.ackLegal(ack)) {;
         resData.push({
             table:0,
@@ -68,13 +71,19 @@ socket.on('message', function (msg, info) {
             ack:ack,
             data:msg.toString()
         });
+        resData.push({
+            table:1,
+            operate:'--------',
+            ack:'--------',
+            data:'--------'
+        });
         var length = swindow.minus(ack) + 1;
         swindow.go(length);
         if (ack === swindow.getCurr()) {
             fillWindow();
             if (swindow.isEmpty()) {
+                response.send('1');
                 socket.close();
-                response.send(resData);
             }
             sendWindow();
         }
@@ -82,12 +91,13 @@ socket.on('message', function (msg, info) {
 });
 
 var gbn_client = {
-    start:function (req,res) {
+    start:function (res,req,end) {
         swindow = Window(parseInt(req.body.winSize), parseInt(req.body.winSize) + 1);
         data = data + req.body.data;
-        response = res;
-        socket.bind();
+        resData = res;
+        response = end;
 
+        socket.bind();
         timer = getTimer();
 
         fillWindow();

@@ -23,12 +23,12 @@ var resData = [];
 
 //处理query请求
 app.post('/gbnclient_protocol',urlencodedParser,function (req,res){
-	gbn_server.start(req,res);
-	gbn_client.start(req,res);
+	gbn_server.start(resData,req);
+	gbn_client.start(resData,req,res);
 });
 
 app.get('/gbnserver_protocol',function (req,res){
-	gbn_server.send(req,res);
+	res.send(resData);
 });
 
 

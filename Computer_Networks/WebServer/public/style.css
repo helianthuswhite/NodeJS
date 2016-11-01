@@ -157,6 +157,12 @@ body {
 	margin-top: 50px;
 	/*overflow-y: scroll;*/
 }
+#body #customer_body #notice {
+	position: absolute;
+	left: 15px;
+	color: #ff0000;
+	top: -2em;
+}
 #body #customer_body table {
 	width: calc(50% - 30px);
 	margin: 0 15px;
