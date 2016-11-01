@@ -9,8 +9,9 @@ var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 var path = require('path');
+var gbn_server = require('./routes/gbn_server');
+var gbn_client = require('./routes/gbn_client');
 
-var lexer = require('./routes/lexer');
 //加载静态文件
 app.use(express.static(path.join(__dirname,'/public')));
 
@@ -18,10 +19,16 @@ app.get('/',function (req,res) {
 	res.sendFile(__dirname + '/public/index.html');
 });
 
+var resData = [];
 
 //处理query请求
-app.post('/lexer',urlencodedParser,function (req,res){
-	lexer.start(req,res);
+app.post('/gbnclient_protocol',urlencodedParser,function (req,res){
+	gbn_server.start(req,res);
+	gbn_client.start(req,res);
+});
+
+app.get('/gbnserver_protocol',function (req,res){
+	gbn_server.send(req,res);
 });
 
 

@@ -2,20 +2,17 @@ var dgram= require('dgram');
 var socket = dgram.createSocket('udp4');
 var Window = require('./window');
 
-var winSize = 5;
-var seqSize = winSize + 1;
-
 // 储存发送窗口的信息
-var swindow = Window(winSize, seqSize);
-var data = '这是我的测试数据';
+var swindow,data = '',timer,response;
 var HOST = '127.0.0.1';
 var PORT = '12345';
 var TIMEOUT = 'timeout';
 // 超时时间
-var outtime = 1000 * 3;
-// 丢失概率
-var probability = 0;
+var outtime = 1000 * 1;
+
 var index = 0;
+
+var resData = [];
 
 function fillWindow () {
     while (index < data.length) {
@@ -28,19 +25,19 @@ function fillWindow () {
 }
 
 function sendOne (seq, chunk) {
-    // 随机丢弃
-    if (Math.random() < probability) {
-        console.log(`==X seq: ${seq}, do not send ${chunk}\n`)
-    } else {
-        console.log(`==> seq: ${seq}, send out ${chunk}\n`)
-        var buf = Buffer.alloc(1)
-        buf.writeInt8(seq)
-        // 填入序号
-        chunk = Buffer.concat([buf, Buffer.from(chunk)])
-        socket.send(chunk, 0, chunk.length, PORT, HOST, (err) => {
-            if (err) socket.close()
-        })
-    }
+    var buf = Buffer.alloc(1);
+    buf.writeInt8(seq);
+    // 填入序号
+    chunk = Buffer.concat([buf, Buffer.from(chunk)]);
+    socket.send(chunk, 0, chunk.length, PORT, HOST, function (err) {
+        if (err) socket.close();
+        resData.push({
+            table:0,
+            operate:'发送',
+            ack:seq,
+            data:chunk.toString()
+        });
+    });
 }
 
 function sendWindow () {
@@ -53,7 +50,6 @@ function sendWindow () {
 // 定时重传
 function getTimer () {
     return setInterval(function () {
-        console.log('== resend\n')
         sendWindow();
     }, outtime);
 }
@@ -65,28 +61,38 @@ socket.on('message', function (msg, info) {
     }
     var ack = msg.readInt8();
     msg = msg.slice(1);
-    console.log(`<== ${msg.toString()}, ack: ${ack}\n`);
-
     if (swindow.ackLegal(ack)) {;
+        resData.push({
+            table:0,
+            operate:'返回',
+            ack:ack,
+            data:msg.toString()
+        });
         var length = swindow.minus(ack) + 1;
         swindow.go(length);
         if (ack === swindow.getCurr()) {
             fillWindow();
-            console.log(swindow.isEmpty());
             if (swindow.isEmpty()) {
                 socket.close();
-                console.log(`finish!, time cost: ${Math.floor((new Date() - startTime) / 1000)}s`);
-                process.exit();
+                response.send(resData);
             }
             sendWindow();
         }
     }
 });
 
-socket.bind();
+var gbn_client = {
+    start:function (req,res) {
+        swindow = Window(parseInt(req.body.winSize), parseInt(req.body.winSize) + 1);
+        data = data + req.body.data;
+        response = res;
+        socket.bind();
 
-var startTime = new Date();
-var timer = getTimer();
+        timer = getTimer();
 
-fillWindow();
-sendWindow();
+        fillWindow();
+        sendWindow();
+    }
+};
+
+module.exports = gbn_client;

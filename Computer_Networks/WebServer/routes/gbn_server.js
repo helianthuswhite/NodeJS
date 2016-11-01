@@ -2,10 +2,12 @@ var dgram = require('dgram');
 var socket = dgram.createSocket('udp4');
 
 var PORT = 12345;
-var seqSize = 6;
+var seqSize,response;
 // 丢失概率
 var probability = 0.3;
 var want = 0,gotFirst = 0;
+
+var resData = [],blankCount = 0;
 
 function write (seq, msg, address, port) {
     var buf = Buffer.alloc(1);
@@ -24,7 +26,17 @@ function accept(seq){
         return seq;
     } else {
         // 返回已接收的序号
-        if (gotFirst) return (want + seqSize - 1) % seqSize;
+        if (gotFirst) {
+            for (var i = 0; i < blankCount; i++) {
+                resData.push({
+                    operate:'----------',
+                    ack:'----------',
+                    data:'----------'
+                });
+            }
+            blankCount = 0;
+            return (want + seqSize - 1) % seqSize;
+        }
         // 返回-1表示还未接收任何正确的序号
         else return -1;
     }
@@ -32,17 +44,36 @@ function accept(seq){
 
 socket.on('message', function (msg, rinfo) {
     var [address, port] = [rinfo.address, rinfo.port];
+
     var seq = msg.readInt8();
     msg = msg.slice(1).toString();
-
+    
     var ack = accept(seq);
     if (Math.random() < probability) {
-        console.log(`==X drop : ${msg}, seq: ${seq}, ack: ${ack}`);
+        resData.push({
+            operate:'丢弃',
+            ack:seq,
+            data:msg
+        });
+        blankCount++;
     } else {
-        console.log(`==> accept : ${msg}, seq: ${seq}, ack: ${ack}`);
+        resData.push({
+            operate:'收到',
+            ack:seq,
+            data:msg
+        });
         write(ack, msg, address, port);
     }
 });
 
-socket.bind(PORT);
+var gbn_server = {
+    start:function (req,res) {
+        seqSize = parseInt(req.body.winSize) + 1;
+        socket.bind(PORT);
+    },
+    send:function (req,res) {
+        res.send(resData);
+    }
+}
 
+module.exports = gbn_server;

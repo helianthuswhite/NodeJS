@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>哈工大实验系统</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div id="head">
+		<h1>哈工大课程实验——计算机网络系统</h1>
+		<div class="user">
+			<span>欢迎您：W_littlewhite</span>
+			<a href="index.html">退出系统</a>
+		</div>
+	</div>
+	<nav id="head_nav">
+		<img src="image/white.png">
+		<ul>
+			<li>
+				<a href="proxy.html">HTTP代理</a>
+			</li>
+			<li>
+				<a href="protocol.html">传输协议</a>
+			</li>
+			<li>
+				<a href="lexeme.html">语义分析</a>
+			</li>
+			<li>
+				<a href="lexeme.html">语义分析</a>
+			</li>
+		</ul>
+	</nav>
+	<div id="body">
+		<section id="customer">
+			<nav>
+				<form id="query_form">
+					<div class="query_head">
+						<label>窗口大小：</label>
+						<input type="text" name="winSize">
+					</div>
+					<div class="query_head">
+						<label>测试数据：</label>
+						<input type="text" name="data" placeholder="输入一串字符串">
+					</div>
+					<div class="query_head">
+						<input type="button" value="执行" id="query">
+					</div>
+				</form>
+			</nav>
+			<div id="customer_body">
+				<table id="client">
+					<tr>
+						<th>操作</th>
+						<th>ack</th>
+						<th>数据</th>
+					</tr>
+				</table>
+				<table id="server">
+					<tr>
+						<th>操作</th>
+						<th>ack</th>
+						<th>数据</th>
+					</tr>
+				</table>
+			</div>
+		</section>
+	</div>
+	<footer> © HuangYunzhi Copyright Reserved</footer>
+	<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#query').click(function () {
+				var dataArray = $('#query_form').serializeArray();
+				for(var i in dataArray) {
+					dataArray[i].value = dataArray[i].value.trim();
+				}
+				$.post('/gbnclient_protocol',dataArray,function (results) {
+					if(results.length == 0) {
+						alert('客户端发送错误!');
+						return;
+					}
+
+					var table = $('#customer_body #client');
+					clearTable(table);
+					$.each(results,function () {
+						createNew(table,$(this)[0].operate,$(this)[0].ack,
+							$(this)[0].data);
+					});
+
+					$.get('/gbnserver_protocol',function (results) {
+						if(results.length == 0) {
+							alert('服务器发生错误!');
+							return;
+						}
+
+						var table = $('#customer_body #server');
+						clearTable(table);
+						$.each(results,function () {
+							createNew(table,$(this)[0].operate,$(this)[0].ack,
+								$(this)[0].data);
+						});
+
+						
+					});
+				});
+			});
+
+			//创建新的数据
+			function createNew(table,orderNo,productName,customerName) {
+				var tr = '<tr><td>'+orderNo+'</td><td>'+productName+'</td><td>'+customerName+'</td>';
+				table.append(tr);
+			}
+
+			//销毁表格中的已有数据
+			function clearTable(table) {
+				table.find('tr').remove();
+				table.append('<tr><th>操作</th><th>ack</th><th>数据</th>');
+			}
+		});
+	</script>
+</body>
+</html>

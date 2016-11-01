@@ -139,7 +139,7 @@ body {
 } 
 #body .query_head input[type='text'] {
 	height: 20px;
-	width: 100px;
+	width: 200px;
 }
 #body .query_head input[type='button'] {
 	width: 100px;
@@ -151,16 +151,20 @@ body {
 }
 #body .query_head input[type='button']:hover {
 	background: #006400;
-	color: #FD8B50;
 }
 #body #customer_body {
 	position: relative;
 	margin-top: 50px;
-	max-height: 600px;
-	overflow-y: scroll;
+	/*overflow-y: scroll;*/
 }
 #body #customer_body table {
-	width: 100%;
+	width: calc(50% - 30px);
+	margin: 0 15px;
+}
+#body #customer_body table:last-child {
+	position: absolute;
+	right: 0px;
+	top: 0px;
 }
 #body #customer_body table tr {
 	height: 30px;
