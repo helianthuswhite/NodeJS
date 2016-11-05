@@ -3,6 +3,7 @@ var window = function (winSize, seqSize)  {
     var data = []
         , next = 0
         , base = 0;
+
     var Obj = {
         getNext: function () {
             return next;

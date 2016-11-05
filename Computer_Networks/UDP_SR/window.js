@@ -2,7 +2,8 @@
 var window = function (winSize, seqSize)  {
     var data = []
         , next = 0
-        , base = 0;
+        , base = 0
+        , acks = {};
     var Obj = {
         getNext: function () {
             return next;
@@ -16,7 +17,33 @@ var window = function (winSize, seqSize)  {
             return data.length === 0;
         },
 
-        getCurr: function () {
+        showAcks: function () {
+            console.log(`${JSON.stringify(acks)}\n`);
+        },
+
+        isAck: function (ack) {
+            return acks[ack];
+        },
+
+        resetAcks: function () {
+            acks = {};
+        },
+
+        saveAck: function (ack) {
+            if(this.ackLegal(ack)) return acks[ack] = 1;
+            else return 0;
+        },
+
+        isAllAck: function () {
+            var length = this.minus(next);
+            for (var i = 0; i < length; i++) {
+                var k = (base + i) % seqSize;
+                if (!acks[k]) return false;
+            }
+            return true;
+        },
+
+        gettCurr: function () {
             var x = next - 1;
             if (x < 0) x += seqSize;
             return x;
@@ -40,12 +67,12 @@ var window = function (winSize, seqSize)  {
             base = (base + length) % seqSize;
         },
 
-        push: function (c) {
+        push: function (c, seq = null) {
             var isWindowFull = !!(this.minus(next) >= winSize);
             if (isWindowFull) return false;
             else {
                 data.push({
-                    seq: next,
+                    seq: next || seq,
                     chunk: c
                 });
                 next = ++next % seqSize;

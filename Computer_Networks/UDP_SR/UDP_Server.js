@@ -1,5 +1,6 @@
 var dgram = require('dgram');
 var socket = dgram.createSocket('udp4');
+var Window = require('./window');
 
 var PORT = 12345;
 var seqSize = 6;

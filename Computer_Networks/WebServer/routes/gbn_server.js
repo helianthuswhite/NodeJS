@@ -48,7 +48,7 @@ socket.on('message', function (msg, rinfo) {
             ack:seq,
             data:msg
         });
-        console.log(`丢掉 drop : ${msg}, seq: ${seq}, ack: ${ack}`);
+        // console.log(`丢掉 drop : ${msg}, seq: ${seq}, ack: ${ack}`);
     } else {
         resData.push({
             table:1,
@@ -56,7 +56,7 @@ socket.on('message', function (msg, rinfo) {
             ack:seq,
             data:msg
         });
-        console.log(`收到 accept : ${msg}, seq: ${seq}, ack: ${ack}`);
+        // console.log(`收到 accept : ${msg}, seq: ${seq}, ack: ${ack}`);
         write(ack, msg, address, port);
     }
 });

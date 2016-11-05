@@ -29,7 +29,7 @@ function sendOne (seq, chunk) {
     buf.writeInt8(seq);
     // 填入序号
     chunk = Buffer.concat([buf, Buffer.from(chunk)]);
-    console.log(`发送 seq: ${seq}, send out ${chunk}\n`)
+    // console.log(`发送 seq: ${seq}, send out ${chunk}\n`);
     socket.send(chunk, 0, chunk.length, PORT, HOST, function (err) {
         if (err) socket.close();
         resData.push({
@@ -52,7 +52,7 @@ function sendWindow () {
 function getTimer () {
     return setInterval(function () {
         sendWindow();
-        console.log('重发 resend\n')
+        // console.log('重发 resend\n')
     }, outtime);
 }
 
@@ -63,7 +63,7 @@ socket.on('message', function (msg, info) {
     }
     var ack = msg.readInt8();
     msg = msg.slice(1);
-    console.log(` 返回 ${msg.toString()}, ack: ${ack}\n`);
+    // console.log(` 返回 ${msg.toString()}, ack: ${ack}\n`);
     if (swindow.ackLegal(ack)) {;
         resData.push({
             table:0,

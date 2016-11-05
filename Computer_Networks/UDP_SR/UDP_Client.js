@@ -3,7 +3,7 @@ var socket = dgram.createSocket('udp4');
 var Window = require('./window');
 
 var winSize = 5;
-var seqSize = winSize + 1;
+var seqSize = 2*winSize + 1;
 
 // 储存发送窗口的信息
 var swindow = Window(winSize, seqSize);
@@ -46,7 +46,9 @@ function sendOne (seq, chunk) {
 function sendWindow () {
     var windata = swindow.getData();
     for (var item of windata) {
-        sendOne(item.seq, item.chunk);
+        if (!swindow.isAck(item.seq)) {
+            sendOne(item.seq, item.chunk);
+        }
     }
 }
 
@@ -67,12 +69,13 @@ socket.on('message', function (msg, info) {
     msg = msg.slice(1);
     console.log(`<== ${msg.toString()}, ack: ${ack}\n`);
 
-    if (swindow.ackLegal(ack)) {;
-        var length = swindow.minus(ack) + 1;
-        swindow.go(length);
-        if (ack === swindow.getCurr()) {
+    if (swindow.ackLegal(ack)) {
+        swindow.saveAck(ack);
+        if(swindow.isAllAck()) {
+            var length = swindow.minus(swindow.getCurr()) + 1;
+            swindow.go(length);
+            swindow.resetAcks();
             fillWindow();
-            console.log(swindow.isEmpty());
             if (swindow.isEmpty()) {
                 socket.close();
                 console.log(`finish!, time cost: ${Math.floor((new Date() - startTime) / 1000)}s`);
