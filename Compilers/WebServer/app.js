@@ -11,6 +11,8 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 var path = require('path');
 
 var lexer = require('./routes/lexer');
+
+var grammar = require('./routes/grammar');
 //加载静态文件
 app.use(express.static(path.join(__dirname,'/public')));
 
@@ -19,11 +21,13 @@ app.get('/',function (req,res) {
 });
 
 
-//处理query请求
 app.post('/lexer',urlencodedParser,function (req,res){
 	lexer.start(req,res);
 });
 
+app.post('/grammar',urlencodedParser,function (req,res){
+	grammar.start(req,res);
+});
 
 //服务器启动
 var server = app.listen(3000,function () {
