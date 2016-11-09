@@ -274,6 +274,9 @@ function compiler_init() {
 
 function main() {
 	compiler_init();
+	fs.writeFile(__dirname + '/parsetable.json',JSON.stringify(PARSING_TABLE,null,4),function (err) {
+		if(err) console.log(err);
+	});
 	TOKEN_SEQUENCE = lexer();
 	syntax_parse();
 	for (var each of SYNTAX_RESULT) 

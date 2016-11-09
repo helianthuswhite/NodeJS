@@ -66,7 +66,7 @@ function grammar_scanner(){
 		for (var each of terminals) {
 			if (TERMINAL.indexOf(each) === -1) TERMINAL.push(each);
 		}
-		TERMINAL.push('$');		
+		TERMINAL.push('$');	
 	}
 }
 
